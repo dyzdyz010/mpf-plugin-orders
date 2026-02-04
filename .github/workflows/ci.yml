@@ -13,8 +13,9 @@ on:
 env:
   QT_VERSION: '6.8.3'
   SDK_VERSION: 'v1.0.0'
+  HTTP_CLIENT_VERSION: 'v1.0.0'
   UI_COMPONENTS_VERSION: 'v1.0.0'
-  PLUGIN_NAME: 'orders'  # orders or rules
+  PLUGIN_NAME: 'orders'
 
 jobs:
   build:
@@ -60,6 +61,13 @@ jobs:
           rm -f *.${{ matrix.ext }}
           cd ../..
           
+          # Download http-client
+          mkdir -p deps/mpf-http-client && cd deps/mpf-http-client
+          gh release download ${{ env.HTTP_CLIENT_VERSION }} -R dyzdyz010/mpf-http-client -p "mpf-http-client-${{ matrix.artifact_suffix }}.${{ matrix.ext }}"
+          [[ "${{ matrix.ext }}" == "tar.gz" ]] && tar -xzf *.tar.gz || 7z x *.zip
+          rm -f *.${{ matrix.ext }}
+          cd ../..
+          
           # Download ui-components
           mkdir -p deps/mpf-ui-components && cd deps/mpf-ui-components
           gh release download ${{ env.UI_COMPONENTS_VERSION }} -R dyzdyz010/mpf-ui-components -p "mpf-ui-components-${{ matrix.artifact_suffix }}.${{ matrix.ext }}"
@@ -74,7 +82,7 @@ jobs:
           cmake -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=$PWD/install \
-            -DCMAKE_PREFIX_PATH="$PWD/deps/mpf-sdk;$PWD/deps/mpf-ui-components"
+            -DCMAKE_PREFIX_PATH="$PWD/deps/mpf-sdk;$PWD/deps/mpf-http-client;$PWD/deps/mpf-ui-components"
 
       - name: Configure (Windows)
         if: runner.os == 'Windows'
@@ -83,7 +91,7 @@ jobs:
           cmake -B build -G "MinGW Makefiles" \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX="$PWD/install" \
-            -DCMAKE_PREFIX_PATH="$PWD/deps/mpf-sdk;$PWD/deps/mpf-ui-components"
+            -DCMAKE_PREFIX_PATH="$PWD/deps/mpf-sdk;$PWD/deps/mpf-http-client;$PWD/deps/mpf-ui-components"
 
       - name: Build
         shell: bash
