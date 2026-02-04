@@ -1,0 +1,14 @@
+{
+    "id": "com.yourco.orders",
+    "name": "Orders Plugin",
+    "version": "1.0.0",
+    "description": "Order management functionality",
+    "vendor": "YourCo",
+    "requires": [
+        {"type": "service", "id": "INavigation", "min": "1.0"}
+    ],
+    "provides": ["OrdersService"],
+    "qmlModules": ["YourCo.Orders"],
+    "priority": 10,
+    "loadOnStartup": true
+}

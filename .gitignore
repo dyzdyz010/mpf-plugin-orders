@@ -1,0 +1,11 @@
+build/
+*.o
+*.so
+*.dll
+*.dylib
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+.cache/
+CMakeUserPresets.json

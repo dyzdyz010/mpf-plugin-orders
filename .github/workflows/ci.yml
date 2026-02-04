@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+env:
+  QT_VERSION: '6.8.3'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            artifact: mpf-plugin-orders-linux-x64
+          - os: windows-latest
+            artifact: mpf-plugin-orders-windows-x64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          cache: true
+
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1-mesa-dev libxkbcommon-dev
+
+      - name: Download dependencies
+        shell: bash
+        run: |
+          mkdir -p ${{ github.workspace }}/sdk
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            # SDK
+            curl -L -o sdk.zip https://github.com/dyzdyz010/mpf-sdk/releases/latest/download/mpf-sdk-windows-x64.zip
+            7z x sdk.zip -o${{ github.workspace }}/sdk
+            # HTTP Client
+            curl -L -o http.zip https://github.com/dyzdyz010/mpf-http-client/releases/latest/download/mpf-http-client-windows-x64.zip
+            7z x http.zip -o${{ github.workspace }}/sdk
+            # UI Components
+            curl -L -o ui.zip https://github.com/dyzdyz010/mpf-ui-components/releases/latest/download/mpf-ui-components-windows-x64.zip
+            7z x ui.zip -o${{ github.workspace }}/sdk
+          else
+            # SDK
+            curl -L -o sdk.tar.gz https://github.com/dyzdyz010/mpf-sdk/releases/latest/download/mpf-sdk-linux-x64.tar.gz
+            tar -xzf sdk.tar.gz -C ${{ github.workspace }}/sdk
+            # HTTP Client
+            curl -L -o http.tar.gz https://github.com/dyzdyz010/mpf-http-client/releases/latest/download/mpf-http-client-linux-x64.tar.gz
+            tar -xzf http.tar.gz -C ${{ github.workspace }}/sdk
+            # UI Components
+            curl -L -o ui.tar.gz https://github.com/dyzdyz010/mpf-ui-components/releases/latest/download/mpf-ui-components-linux-x64.tar.gz
+            tar -xzf ui.tar.gz -C ${{ github.workspace }}/sdk
+          fi
+
+      - name: Configure
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_PREFIX_PATH="${{ github.workspace }}/sdk"
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Package
+        shell: bash
+        run: |
+          mkdir -p package/plugins package/qml
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            cp build/plugins/*.dll package/plugins/
+          else
+            cp build/plugins/*.so package/plugins/
+          fi
+          cp -r build/qml/* package/qml/ 2>/dev/null || true
+          cd package
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            7z a -tzip ../${{ matrix.artifact }}.zip .
+          else
+            tar -czvf ../${{ matrix.artifact }}.tar.gz .
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.*
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: artifacts/**/*
+          generate_release_notes: true
