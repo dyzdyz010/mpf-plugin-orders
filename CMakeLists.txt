@@ -126,6 +126,13 @@ target_link_libraries(orders-plugin PRIVATE
 # OUTPUT_DIRECTORY: QML 模块输出目录，与 URI 对应
 # NO_PLUGIN: 表示 QML 模块嵌入到插件 DLL 中，不单独生成 QML 插件
 # -----------------------------------------------------------------------------
+# Set resource aliases to remove qml/ prefix from output paths
+# This makes output: YourCo/Orders/OrdersPage.qml instead of YourCo/Orders/qml/OrdersPage.qml
+set_source_files_properties(qml/OrdersPage.qml PROPERTIES QT_RESOURCE_ALIAS OrdersPage.qml)
+set_source_files_properties(qml/OrderDetailPage.qml PROPERTIES QT_RESOURCE_ALIAS OrderDetailPage.qml)
+set_source_files_properties(qml/OrderCard.qml PROPERTIES QT_RESOURCE_ALIAS OrderCard.qml)
+set_source_files_properties(qml/CreateOrderDialog.qml PROPERTIES QT_RESOURCE_ALIAS CreateOrderDialog.qml)
+
 qt_add_qml_module(orders-plugin
     URI YourCo.Orders         # 【必改】改为你的模块 URI
     VERSION 1.0
