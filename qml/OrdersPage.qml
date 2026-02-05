@@ -202,14 +202,13 @@ Page {
             createdAt: model.createdAt
 
             // -----------------------------------------------------------------
-            // 【导航】
-            // Navigation 是宿主应用提供的全局导航服务
-            // push(route, params) 导航到指定路由，并传递参数
-            //
-            // 路由名称在插件 start() 中通过 INavigation::registerRoute 注册
+            // 【详情弹窗】
+            // 点击订单卡片打开详情弹窗（Popup），不使用页面导航
+            // 这避免了跨 DLL 动态加载 QML 组件的问题
             // -----------------------------------------------------------------
             onClicked: {
-                Navigation.push("orders/detail", {orderId: model.id})
+                detailPopup.orderId = model.id
+                detailPopup.open()
             }
 
             // 状态变更处理
@@ -251,9 +250,136 @@ Page {
     }
 
     // -------------------------------------------------------------------------
+    // 【订单详情弹窗】
+    // 使用 Popup 显示订单详情，避免页面导航
+    // -------------------------------------------------------------------------
+    Popup {
+        id: detailPopup
+        
+        property string orderId: ""
+        property var orderData: ({})
+        
+        modal: true
+        anchors.centerIn: parent
+        width: Math.min(500, root.width - 48)
+        height: Math.min(600, root.height - 48)
+        padding: 24
+        
+        background: Rectangle {
+            color: Theme ? Theme.surfaceColor : "#FFFFFF"
+            radius: Theme ? Theme.radiusMedium : 12
+        }
+        
+        onOpened: {
+            orderData = OrdersService.getOrder(orderId)
+        }
+        
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 16
+            
+            // Header
+            RowLayout {
+                Layout.fillWidth: true
+                
+                Label {
+                    text: qsTr("Order #%1").arg(detailPopup.orderId)
+                    font.pixelSize: 20
+                    font.bold: true
+                    color: Theme ? Theme.textColor : "#212121"
+                    Layout.fillWidth: true
+                }
+                
+                Button {
+                    text: "✕"
+                    flat: true
+                    onClicked: detailPopup.close()
+                }
+            }
+            
+            // Status
+            RowLayout {
+                Label { text: qsTr("Status:"); color: Theme ? Theme.textSecondaryColor : "#757575" }
+                Label { 
+                    text: detailPopup.orderData.status || ""
+                    font.bold: true
+                    color: Theme ? Theme.primaryColor : "#2196F3"
+                }
+            }
+            
+            // Customer
+            RowLayout {
+                Label { text: qsTr("Customer:"); color: Theme ? Theme.textSecondaryColor : "#757575" }
+                Label { text: detailPopup.orderData.customerName || ""; color: Theme ? Theme.textColor : "#212121" }
+            }
+            
+            // Product
+            RowLayout {
+                Label { text: qsTr("Product:"); color: Theme ? Theme.textSecondaryColor : "#757575" }
+                Label { text: detailPopup.orderData.productName || ""; color: Theme ? Theme.textColor : "#212121" }
+            }
+            
+            // Quantity & Price
+            RowLayout {
+                Label { text: qsTr("Quantity:"); color: Theme ? Theme.textSecondaryColor : "#757575" }
+                Label { text: String(detailPopup.orderData.quantity || 0); color: Theme ? Theme.textColor : "#212121" }
+                Item { width: 24 }
+                Label { text: qsTr("Price:"); color: Theme ? Theme.textSecondaryColor : "#757575" }
+                Label { text: "$" + (detailPopup.orderData.price || 0).toFixed(2); color: Theme ? Theme.textColor : "#212121" }
+            }
+            
+            // Total
+            RowLayout {
+                Label { text: qsTr("Total:"); font.bold: true; color: Theme ? Theme.textSecondaryColor : "#757575" }
+                Label { 
+                    text: "$" + (detailPopup.orderData.total || 0).toFixed(2)
+                    font.pixelSize: 18
+                    font.bold: true
+                    color: Theme ? Theme.primaryColor : "#2196F3"
+                }
+            }
+            
+            Item { Layout.fillHeight: true }
+            
+            // Actions
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 8
+                
+                ComboBox {
+                    id: statusCombo
+                    model: ["pending", "processing", "shipped", "delivered", "cancelled"]
+                    currentIndex: model.indexOf(detailPopup.orderData.status)
+                    
+                    onActivated: function(index) {
+                        if (model[index] !== detailPopup.orderData.status) {
+                            OrdersService.updateStatus(detailPopup.orderId, model[index])
+                            detailPopup.orderData = OrdersService.getOrder(detailPopup.orderId)
+                        }
+                    }
+                }
+                
+                Item { Layout.fillWidth: true }
+                
+                Button {
+                    text: qsTr("Delete")
+                    onClicked: {
+                        deleteDialog.orderId = detailPopup.orderId
+                        deleteDialog.open()
+                        detailPopup.close()
+                    }
+                }
+                
+                Button {
+                    text: qsTr("Close")
+                    onClicked: detailPopup.close()
+                }
+            }
+        }
+    }
+    
+    // -------------------------------------------------------------------------
     // 【删除确认对话框】
-    // 使用 Qt Quick Controls 的 Dialog 组件
-    // 【修改点4】可以改为使用 MPFDialog 获得统一风格
     // -------------------------------------------------------------------------
     Dialog {
         id: deleteDialog
