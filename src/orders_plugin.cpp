@@ -252,14 +252,14 @@ void OrdersPlugin::registerRoutes()
         }
         
         QString ordersPage = QUrl::fromLocalFile(qmlBase + "/OrdersPage.qml").toString();
-        QString detailPage = QUrl::fromLocalFile(qmlBase + "/OrderDetailPage.qml").toString();
         
         MPF_LOG_DEBUG("OrdersPlugin", QString("QML base path: %1").arg(qmlBase).toStdString().c_str());
+        MPF_LOG_DEBUG("OrdersPlugin", QString("Orders page URL: %1").arg(ordersPage).toStdString().c_str());
         
+        // Only register main page - detail pages use Popup/Dialog inside the plugin
         nav->registerRoute("orders", ordersPage);
-        nav->registerRoute("orders/detail", detailPage);
         
-        MPF_LOG_DEBUG("OrdersPlugin", "Registered navigation routes (file://)");
+        MPF_LOG_DEBUG("OrdersPlugin", "Registered main page route (file://)");
     }
     
     // -------------------------------------------------------------------------
