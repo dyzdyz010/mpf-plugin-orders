@@ -126,20 +126,24 @@ target_link_libraries(orders-plugin PRIVATE
 # OUTPUT_DIRECTORY: QML 模块输出目录，与 URI 对应
 # NO_PLUGIN: 表示 QML 模块嵌入到插件 DLL 中，不单独生成 QML 插件
 # -----------------------------------------------------------------------------
-# Set resource aliases to remove qml/ prefix from output paths
-# This makes output: YourCo/Orders/OrdersPage.qml instead of YourCo/Orders/qml/OrdersPage.qml
-set_source_files_properties(qml/OrdersPage.qml PROPERTIES QT_RESOURCE_ALIAS OrdersPage.qml)
-set_source_files_properties(qml/OrderCard.qml PROPERTIES QT_RESOURCE_ALIAS OrderCard.qml)
-set_source_files_properties(qml/CreateOrderDialog.qml PROPERTIES QT_RESOURCE_ALIAS CreateOrderDialog.qml)
+# QML 文件 - 添加新文件只需加到这个列表
+set(PLUGIN_QML_FILES
+    qml/OrdersPage.qml           # 主页面（详情用 Popup 显示）
+    qml/OrderCard.qml            # 列表项卡片
+    qml/CreateOrderDialog.qml    # 创建对话框
+)
+
+# Auto-flatten paths: qml/Foo.qml -> Foo.qml
+foreach(file ${PLUGIN_QML_FILES})
+    string(REGEX REPLACE "^qml/" "" alias "${file}")
+    set_source_files_properties(${file} PROPERTIES QT_RESOURCE_ALIAS ${alias})
+endforeach()
 
 qt_add_qml_module(orders-plugin
     URI YourCo.Orders         # 【必改】改为你的模块 URI
     VERSION 1.0
     RESOURCE_PREFIX /
-    QML_FILES
-        qml/OrdersPage.qml           # 主页面（详情用 Popup 显示）
-        qml/OrderCard.qml            # 列表项卡片
-        qml/CreateOrderDialog.qml    # 创建对话框
+    QML_FILES ${PLUGIN_QML_FILES}
     OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/qml/YourCo/Orders  # 【必改】与 URI 对应
     NO_PLUGIN  # QML 模块嵌入到主插件 DLL
 )
