@@ -42,16 +42,11 @@ namespace orders {
 // 构造/析构
 // =============================================================================
 
-// Qt 资源初始化 - 必须在构造函数之前声明
-// 资源名称由 qt_add_qml_module 自动生成，格式: target_raw_qml_0
-extern "C" void qInitResources_orders_plugin_raw_qml_0();
-
 OrdersPlugin::OrdersPlugin(QObject* parent)
     : QObject(parent)
 {
-    // 初始化嵌入的 QML 资源
-    // 对于动态加载的插件，必须手动调用资源初始化
-    qInitResources_orders_plugin_raw_qml_0();
+    // 构造函数中不要做太多初始化工作
+    // 主要初始化放在 initialize() 中
 }
 
 OrdersPlugin::~OrdersPlugin() = default;
