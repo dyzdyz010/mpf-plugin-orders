@@ -235,9 +235,10 @@ void OrdersPlugin::registerRoutes()
         QString appDir = QCoreApplication::applicationDirPath();
         importPaths.prepend(QDir::cleanPath(appDir + "/../qml"));
         
-        // 查找包含 YourCo/Orders 的路径（qt_add_qml_module 输出目录结构）
+        // 查找包含 YourCo/Orders/qml 的路径
+        // qt_add_qml_module 保留源文件的目录结构，所以 qml/ 子目录会保留
         for (const QString& importPath : importPaths) {
-            QString candidate = QDir::cleanPath(importPath + "/YourCo/Orders");
+            QString candidate = QDir::cleanPath(importPath + "/YourCo/Orders/qml");
             if (QDir(candidate).exists()) {
                 qmlBase = candidate;
                 break;
@@ -245,9 +246,9 @@ void OrdersPlugin::registerRoutes()
         }
         
         if (qmlBase.isEmpty()) {
-            MPF_LOG_WARNING("OrdersPlugin", "Could not find YourCo/Orders in any import path!");
+            MPF_LOG_WARNING("OrdersPlugin", "Could not find YourCo/Orders/qml in any import path!");
             // Fallback to relative path from app
-            qmlBase = QDir::cleanPath(appDir + "/../qml/YourCo/Orders");
+            qmlBase = QDir::cleanPath(appDir + "/../qml/YourCo/Orders/qml");
         }
         
         QString ordersPage = QUrl::fromLocalFile(qmlBase + "/OrdersPage.qml").toString();
