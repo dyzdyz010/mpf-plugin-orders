@@ -223,14 +223,20 @@ void OrdersPlugin::registerRoutes()
     // -------------------------------------------------------------------------
     auto* nav = m_registry->get<mpf::INavigation>();
     if (nav) {
-        // 使用 qrc:// 路径 - QML 资源已通过 qt_add_qml_module 编译到插件中
-        // 路径格式: qrc:/<URI_PATH>/<QML_FILES_PATH>
-        // URI: YourCo.Orders -> YourCo/Orders
-        // QML_FILES: qml/OrdersPage.qml -> 保留 qml/ 子目录
-        nav->registerRoute("orders", "qrc:/YourCo/Orders/qml/OrdersPage.qml");
-        nav->registerRoute("orders/detail", "qrc:/YourCo/Orders/qml/OrderDetailPage.qml");
+        // 使用 file:// 路径 - 基于应用程序目录查找 QML 文件
+        // qrc:// 在 Windows 动态加载插件时有问题
+        QString appDir = QCoreApplication::applicationDirPath();
+        QString qmlBase = QDir::cleanPath(appDir + "/../qml/YourCo/Orders/qml");
         
-        MPF_LOG_DEBUG("OrdersPlugin", "Registered navigation routes (qrc:/YourCo/Orders/qml/)");
+        QString ordersPage = QUrl::fromLocalFile(qmlBase + "/OrdersPage.qml").toString();
+        QString detailPage = QUrl::fromLocalFile(qmlBase + "/OrderDetailPage.qml").toString();
+        
+        MPF_LOG_DEBUG("OrdersPlugin", QString("QML base path: %1").arg(qmlBase).toStdString().c_str());
+        
+        nav->registerRoute("orders", ordersPage);
+        nav->registerRoute("orders/detail", detailPage);
+        
+        MPF_LOG_DEBUG("OrdersPlugin", "Registered navigation routes (file://)");
     }
     
     // -------------------------------------------------------------------------
