@@ -223,10 +223,32 @@ void OrdersPlugin::registerRoutes()
     // -------------------------------------------------------------------------
     auto* nav = m_registry->get<mpf::INavigation>();
     if (nav) {
-        // 使用 file:// 路径 - 基于应用程序目录查找 QML 文件
-        // qrc:// 在 Windows 动态加载插件时有问题
+        // 在 QML 导入路径中查找 YourCo/Orders 目录
+        // 这支持开发模式（从 build 目录）和生产模式（从 SDK 目录）
+        QString qmlBase;
+        
+        // 获取 QML 导入路径（来自 QML_IMPORT_PATH 环境变量）
+        QString qmlImportPaths = qEnvironmentVariable("QML_IMPORT_PATH");
+        QStringList importPaths = qmlImportPaths.split(QDir::listSeparator(), Qt::SkipEmptyParts);
+        
+        // 也检查应用程序目录的相对路径（SDK 安装位置）
         QString appDir = QCoreApplication::applicationDirPath();
-        QString qmlBase = QDir::cleanPath(appDir + "/../qml/YourCo/Orders/qml");
+        importPaths.prepend(QDir::cleanPath(appDir + "/../qml"));
+        
+        // 查找包含 YourCo/Orders/qml 的路径
+        for (const QString& importPath : importPaths) {
+            QString candidate = QDir::cleanPath(importPath + "/YourCo/Orders/qml");
+            if (QDir(candidate).exists()) {
+                qmlBase = candidate;
+                break;
+            }
+        }
+        
+        if (qmlBase.isEmpty()) {
+            MPF_LOG_WARNING("OrdersPlugin", "Could not find YourCo/Orders/qml in any import path!");
+            // Fallback to relative path from app
+            qmlBase = QDir::cleanPath(appDir + "/../qml/YourCo/Orders/qml");
+        }
         
         QString ordersPage = QUrl::fromLocalFile(qmlBase + "/OrdersPage.qml").toString();
         QString detailPage = QUrl::fromLocalFile(qmlBase + "/OrderDetailPage.qml").toString();
