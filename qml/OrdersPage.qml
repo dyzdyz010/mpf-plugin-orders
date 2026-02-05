@@ -32,12 +32,10 @@ import QtQuick.Layouts
 
 // -----------------------------------------------------------------------------
 // 【模块导入】
-// YourCo.Orders: 插件的 QML 模块，提供 OrdersService 和 OrderModel
+// OrdersService 和 OrderModel 已在 C++ 中注册到 QML 引擎
 // MPF.Components: MPF UI 组件库，提供 MPFCard、MPFButton 等组件
-//
-// 【修改点1】将 YourCo.Orders 改为你的模块 URI
 // -----------------------------------------------------------------------------
-import YourCo.Orders 1.0
+// import YourCo.Orders 1.0  // 不需要，类型已在 C++ 中注册
 import MPF.Components 1.0
 
 Page {

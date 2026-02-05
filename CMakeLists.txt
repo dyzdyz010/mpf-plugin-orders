@@ -129,7 +129,7 @@ target_link_libraries(orders-plugin PRIVATE
 qt_add_qml_module(orders-plugin
     URI YourCo.Orders         # 【必改】改为你的模块 URI
     VERSION 1.0
-    RESOURCE_PREFIX /         # 使资源路径为 :/YourCo/Orders/ 而非 :/qt/qml/YourCo/Orders/
+    RESOURCE_PREFIX /
     QML_FILES
         qml/OrdersPage.qml           # 主页面
         qml/OrderDetailPage.qml      # 详情页
