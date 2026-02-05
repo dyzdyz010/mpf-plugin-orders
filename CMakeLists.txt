@@ -130,7 +130,6 @@ qt_add_qml_module(orders-plugin
     URI YourCo.Orders         # 【必改】改为你的模块 URI
     VERSION 1.0
     RESOURCE_PREFIX /
-    NO_RESOURCE_TARGET_PATH   # 不生成 prefer 指令，避免 qrc 加载问题
     QML_FILES
         qml/OrdersPage.qml           # 主页面
         qml/OrderDetailPage.qml      # 详情页
