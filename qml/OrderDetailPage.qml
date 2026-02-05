@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import YourCo.Orders 1.0
+// import YourCo.Orders 1.0  // 不需要，类型已在 C++ 中注册
 import MPF.Components 1.0
 
 Page {
