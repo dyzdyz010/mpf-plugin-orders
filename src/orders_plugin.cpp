@@ -34,6 +34,9 @@
 
 #include <QJsonDocument>
 #include <QQmlEngine>
+#include <QCoreApplication>
+#include <QDir>
+#include <QUrl>
 
 // 【修改点1】命名空间
 namespace orders {
@@ -206,12 +209,20 @@ void OrdersPlugin::registerRoutes()
     // -------------------------------------------------------------------------
     auto* nav = m_registry->get<mpf::INavigation>();
     if (nav) {
-        // 主页面路由
-        // Qt 6 路径: qrc:/qt/qml/{URI}/{QML_FILES路径}
-        // QML_FILES 定义为 qml/OrdersPage.qml，所以完整路径包含 qml/ 子目录
-        nav->registerRoute("orders", "qrc:/qt/qml/YourCo/Orders/qml/OrdersPage.qml");
-        // 详情页路由（支持参数传递）
-        nav->registerRoute("orders/detail", "qrc:/qt/qml/YourCo/Orders/qml/OrderDetailPage.qml");
+        // 使用 file:// 路径而非 qrc://（动态加载的插件在 Windows 上 qrc 资源不可靠）
+        // 获取应用程序目录，构建 QML 文件路径
+        QString appDir = QCoreApplication::applicationDirPath();
+        // 从 bin/ 目录上升到 SDK 根目录，然后进入 qml/
+        QString qmlBase = QDir(appDir).filePath("../qml/YourCo/Orders/qml");
+        qmlBase = QDir::cleanPath(qmlBase);
+        
+        QString ordersPage = QUrl::fromLocalFile(qmlBase + "/OrdersPage.qml").toString();
+        QString detailPage = QUrl::fromLocalFile(qmlBase + "/OrderDetailPage.qml").toString();
+        
+        MPF_LOG_DEBUG("OrdersPlugin", QString("QML base path: %1").arg(qmlBase).toStdString().c_str());
+        
+        nav->registerRoute("orders", ordersPage);
+        nav->registerRoute("orders/detail", detailPage);
         
         MPF_LOG_DEBUG("OrdersPlugin", "Registered navigation routes");
     }
