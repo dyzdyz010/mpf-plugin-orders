@@ -207,9 +207,10 @@ void OrdersPlugin::registerRoutes()
     auto* nav = m_registry->get<mpf::INavigation>();
     if (nav) {
         // 主页面路由
-        nav->registerRoute("orders", "qrc:/YourCo/Orders/qml/OrdersPage.qml");
+        // Qt 6 qt_add_qml_module 默认资源前缀是 /qt/qml/
+        nav->registerRoute("orders", "qrc:/qt/qml/YourCo/Orders/OrdersPage.qml");
         // 详情页路由（支持参数传递）
-        nav->registerRoute("orders/detail", "qrc:/YourCo/Orders/qml/OrderDetailPage.qml");
+        nav->registerRoute("orders/detail", "qrc:/qt/qml/YourCo/Orders/OrderDetailPage.qml");
         
         MPF_LOG_DEBUG("OrdersPlugin", "Registered navigation routes");
     }
