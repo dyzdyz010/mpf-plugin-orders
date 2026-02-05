@@ -222,40 +222,53 @@ void OrdersPlugin::registerRoutes()
     // -------------------------------------------------------------------------
     auto* nav = m_registry->get<mpf::INavigation>();
     if (nav) {
-        // 在 QML 导入路径中查找 YourCo/Orders 目录
-        QString qmlBase;
-        
-        // 获取 QML 导入路径（来自 QML_IMPORT_PATH 环境变量）
-        QString qmlImportPaths = qEnvironmentVariable("QML_IMPORT_PATH");
-        QStringList importPaths = qmlImportPaths.split(QDir::listSeparator(), Qt::SkipEmptyParts);
-        
-        // 也检查应用程序目录的相对路径（SDK 安装位置）
+        // 构建 QML 搜索路径列表（优先级从高到低）
+        QStringList searchPaths;
         QString appDir = QCoreApplication::applicationDirPath();
-        importPaths.prepend(QDir::cleanPath(appDir + "/../qml"));
+        
+        // 1. MPF_SDK_ROOT 环境变量（mpf-dev 设置）
+        QString sdkRoot = qEnvironmentVariable("MPF_SDK_ROOT");
+        if (!sdkRoot.isEmpty()) {
+            searchPaths << QDir::cleanPath(sdkRoot + "/qml");
+        }
+        
+        // 2. QML_IMPORT_PATH 环境变量
+        QString qmlImportPaths = qEnvironmentVariable("QML_IMPORT_PATH");
+        searchPaths << qmlImportPaths.split(QDir::listSeparator(), Qt::SkipEmptyParts);
+        
+        // 3. 应用程序相对路径（标准 SDK 安装布局）
+        searchPaths << QDir::cleanPath(appDir + "/../qml");
+        
+        // 4. 应用程序同级 qml 目录（开发模式）
+        searchPaths << QDir::cleanPath(appDir + "/qml");
         
         // 查找 QML 模块目录
-        for (const QString& importPath : importPaths) {
-            QString candidate = QDir::cleanPath(importPath + "/YourCo/Orders");
-            if (QDir(candidate).exists()) {
-                qmlBase = candidate;
+        QString qmlBase;
+        QString qmlFile;
+        for (const QString& basePath : searchPaths) {
+            QString candidate = QDir::cleanPath(basePath + "/YourCo/Orders/OrdersPage.qml");
+            if (QFile::exists(candidate)) {
+                qmlBase = QDir::cleanPath(basePath + "/YourCo/Orders");
+                qmlFile = candidate;
                 break;
             }
         }
         
-        if (qmlBase.isEmpty()) {
-            MPF_LOG_WARNING("OrdersPlugin", "Could not find YourCo/Orders in any import path!");
-            qmlBase = QDir::cleanPath(appDir + "/../qml/YourCo/Orders");
+        if (qmlFile.isEmpty()) {
+            MPF_LOG_ERROR("OrdersPlugin", "Could not find YourCo/Orders/OrdersPage.qml!");
+            MPF_LOG_ERROR("OrdersPlugin", QString("Searched paths: %1").arg(searchPaths.join("; ")).toStdString().c_str());
+            return;
         }
         
-        QString ordersPage = QUrl::fromLocalFile(qmlBase + "/OrdersPage.qml").toString();
+        QString ordersPage = QUrl::fromLocalFile(qmlFile).toString();
         
-        MPF_LOG_DEBUG("OrdersPlugin", QString("QML base path: %1").arg(qmlBase).toStdString().c_str());
-        MPF_LOG_DEBUG("OrdersPlugin", QString("Orders page URL: %1").arg(ordersPage).toStdString().c_str());
+        MPF_LOG_INFO("OrdersPlugin", QString("QML base path: %1").arg(qmlBase).toStdString().c_str());
+        MPF_LOG_INFO("OrdersPlugin", QString("Orders page URL: %1").arg(ordersPage).toStdString().c_str());
         
         // 注册主页面（内部导航使用 Popup）
         nav->registerRoute("orders", ordersPage);
         
-        MPF_LOG_DEBUG("OrdersPlugin", "Registered main page route");
+        MPF_LOG_INFO("OrdersPlugin", "Registered route: orders");
     }
     
     // -------------------------------------------------------------------------
