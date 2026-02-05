@@ -37,6 +37,7 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QUrl>
+#include <QFile>
 
 // 【修改点1】命名空间
 namespace orders {
@@ -72,6 +73,19 @@ bool OrdersPlugin::initialize(mpf::ServiceRegistry* registry)
     // 第一个参数是标签（通常用插件名），第二个是消息
     // -------------------------------------------------------------------------
     MPF_LOG_INFO("OrdersPlugin", "Initializing...");
+    
+    // -------------------------------------------------------------------------
+    // 【调试】检查 qrc 资源是否可访问
+    // -------------------------------------------------------------------------
+    QStringList resourcesToCheck = {
+        ":/YourCo/Orders/qml/OrdersPage.qml",
+        "qrc:/YourCo/Orders/qml/OrdersPage.qml"
+    };
+    for (const QString& res : resourcesToCheck) {
+        QFile f(res);
+        MPF_LOG_DEBUG("OrdersPlugin", 
+            QString("Resource check: %1 exists=%2").arg(res).arg(f.exists() ? "YES" : "NO").toStdString().c_str());
+    }
     
     // -------------------------------------------------------------------------
     // 【服务创建】
