@@ -129,7 +129,6 @@ target_link_libraries(orders-plugin PRIVATE
 # Set resource aliases to remove qml/ prefix from output paths
 # This makes output: YourCo/Orders/OrdersPage.qml instead of YourCo/Orders/qml/OrdersPage.qml
 set_source_files_properties(qml/OrdersPage.qml PROPERTIES QT_RESOURCE_ALIAS OrdersPage.qml)
-set_source_files_properties(qml/OrderDetailPage.qml PROPERTIES QT_RESOURCE_ALIAS OrderDetailPage.qml)
 set_source_files_properties(qml/OrderCard.qml PROPERTIES QT_RESOURCE_ALIAS OrderCard.qml)
 set_source_files_properties(qml/CreateOrderDialog.qml PROPERTIES QT_RESOURCE_ALIAS CreateOrderDialog.qml)
 
@@ -138,8 +137,7 @@ qt_add_qml_module(orders-plugin
     VERSION 1.0
     RESOURCE_PREFIX /
     QML_FILES
-        qml/OrdersPage.qml           # 主页面
-        qml/OrderDetailPage.qml      # 详情页
+        qml/OrdersPage.qml           # 主页面（详情用 Popup 显示）
         qml/OrderCard.qml            # 列表项卡片
         qml/CreateOrderDialog.qml    # 创建对话框
     OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/qml/YourCo/Orders  # 【必改】与 URI 对应

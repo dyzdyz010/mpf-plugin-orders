@@ -213,18 +213,16 @@ void OrdersPlugin::registerRoutes()
 {
     // -------------------------------------------------------------------------
     // 【导航路由注册】
-    // 使用 INavigation 服务注册页面路由
+    // 使用 INavigation 服务注册插件主页面
     // 
-    // 路由格式: "route/path" -> "qrc:/URI/Path/Page.qml"
-    // - 路由名称用于 Navigation.push("route/path", params)
-    // - QML 路径使用 qrc:/ 前缀，对应 qt_add_qml_module 的输出
-    // 
-    // 【修改点4】修改路由名称和 QML 路径
+    // 新架构（Loader-based）：
+    // - 只注册一个主页面 URL
+    // - 插件内部导航使用 Popup/Dialog
+    // - 避免跨 DLL 动态加载 QML 组件的问题
     // -------------------------------------------------------------------------
     auto* nav = m_registry->get<mpf::INavigation>();
     if (nav) {
         // 在 QML 导入路径中查找 YourCo/Orders 目录
-        // 这支持开发模式（从 build 目录）和生产模式（从 SDK 目录）
         QString qmlBase;
         
         // 获取 QML 导入路径（来自 QML_IMPORT_PATH 环境变量）
@@ -235,8 +233,7 @@ void OrdersPlugin::registerRoutes()
         QString appDir = QCoreApplication::applicationDirPath();
         importPaths.prepend(QDir::cleanPath(appDir + "/../qml"));
         
-        // 查找包含 YourCo/Orders 的路径
-        // 使用 QT_RESOURCE_ALIAS 后，输出为 YourCo/Orders/OrdersPage.qml（无 qml 子目录）
+        // 查找 QML 模块目录
         for (const QString& importPath : importPaths) {
             QString candidate = QDir::cleanPath(importPath + "/YourCo/Orders");
             if (QDir(candidate).exists()) {
@@ -247,7 +244,6 @@ void OrdersPlugin::registerRoutes()
         
         if (qmlBase.isEmpty()) {
             MPF_LOG_WARNING("OrdersPlugin", "Could not find YourCo/Orders in any import path!");
-            // Fallback to relative path from app
             qmlBase = QDir::cleanPath(appDir + "/../qml/YourCo/Orders");
         }
         
@@ -256,10 +252,10 @@ void OrdersPlugin::registerRoutes()
         MPF_LOG_DEBUG("OrdersPlugin", QString("QML base path: %1").arg(qmlBase).toStdString().c_str());
         MPF_LOG_DEBUG("OrdersPlugin", QString("Orders page URL: %1").arg(ordersPage).toStdString().c_str());
         
-        // Only register main page - detail pages use Popup/Dialog inside the plugin
+        // 注册主页面（内部导航使用 Popup）
         nav->registerRoute("orders", ordersPage);
         
-        MPF_LOG_DEBUG("OrdersPlugin", "Registered main page route (file://)");
+        MPF_LOG_DEBUG("OrdersPlugin", "Registered main page route");
     }
     
     // -------------------------------------------------------------------------
