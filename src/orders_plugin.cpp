@@ -42,11 +42,16 @@ namespace orders {
 // 构造/析构
 // =============================================================================
 
+// Qt 资源初始化 - 必须在构造函数之前声明
+// 资源名称由 qt_add_qml_module 自动生成，格式: target_raw_qml_0
+extern "C" void qInitResources_orders_plugin_raw_qml_0();
+
 OrdersPlugin::OrdersPlugin(QObject* parent)
     : QObject(parent)
 {
-    // 构造函数中不要做太多初始化工作
-    // 主要初始化放在 initialize() 中
+    // 初始化嵌入的 QML 资源
+    // 对于动态加载的插件，必须手动调用资源初始化
+    qInitResources_orders_plugin_raw_qml_0();
 }
 
 OrdersPlugin::~OrdersPlugin() = default;
@@ -207,10 +212,11 @@ void OrdersPlugin::registerRoutes()
     auto* nav = m_registry->get<mpf::INavigation>();
     if (nav) {
         // 主页面路由
-        // Qt 6 qt_add_qml_module 默认资源前缀是 /qt/qml/
-        nav->registerRoute("orders", "qrc:/qt/qml/YourCo/Orders/OrdersPage.qml");
+        // Qt 6 路径: qrc:/qt/qml/{URI}/{QML_FILES路径}
+        // QML_FILES 定义为 qml/OrdersPage.qml，所以完整路径包含 qml/ 子目录
+        nav->registerRoute("orders", "qrc:/qt/qml/YourCo/Orders/qml/OrdersPage.qml");
         // 详情页路由（支持参数传递）
-        nav->registerRoute("orders/detail", "qrc:/qt/qml/YourCo/Orders/OrderDetailPage.qml");
+        nav->registerRoute("orders/detail", "qrc:/qt/qml/YourCo/Orders/qml/OrderDetailPage.qml");
         
         MPF_LOG_DEBUG("OrdersPlugin", "Registered navigation routes");
     }
