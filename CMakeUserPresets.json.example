@@ -1,0 +1,42 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "dev",
+      "displayName": "MPF Development",
+      "description": "Development preset with MPF SDK",
+      "generator": "MinGW Makefiles",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_PREFIX_PATH": "C:/Qt/6.8.3/mingw_64;$env{USERPROFILE}/.mpf-sdk/current",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "QML_IMPORT_PATH": "$env{USERPROFILE}/.mpf-sdk/current/qml;C:/Qt/6.8.3/mingw_64/qml"
+      },
+      "environment": {
+        "MPF_SDK_ROOT": "$env{USERPROFILE}/.mpf-sdk/current"
+      }
+    },
+    {
+      "name": "dev-ninja",
+      "displayName": "MPF Development (Ninja)",
+      "inherits": "dev",
+      "generator": "Ninja"
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "dev",
+      "configurePreset": "dev"
+    },
+    {
+      "name": "dev-ninja",
+      "configurePreset": "dev-ninja"
+    }
+  ]
+}

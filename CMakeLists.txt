@@ -177,3 +177,18 @@ install(TARGETS orders-plugin
 install(DIRECTORY ${CMAKE_BINARY_DIR}/qml/YourCo  # 【必改】与 URI 前缀对应
     DESTINATION qml
 )
+
+# -----------------------------------------------------------------------------
+# Qt Creator QML 代码提示配置
+# 设置 QML_IMPORT_PATH 让 Qt Creator 能找到 MPF.Components 等模块
+# -----------------------------------------------------------------------------
+if(DEFINED ENV{MPF_SDK_ROOT})
+    set(QML_IMPORT_PATH "$ENV{MPF_SDK_ROOT}/qml" CACHE STRING "QML Import Path" FORCE)
+    message(STATUS "QML_IMPORT_PATH set to: ${QML_IMPORT_PATH}")
+endif()
+
+# 也可以从 MPF SDK 路径推断
+if(MPF_QML_PATH)
+    list(APPEND QML_IMPORT_PATH "${MPF_QML_PATH}")
+    set(QML_IMPORT_PATH "${QML_IMPORT_PATH}" CACHE STRING "QML Import Path" FORCE)
+endif()
