@@ -59,7 +59,9 @@ find_package(MPF REQUIRED)
 # 如果不需要某个库，注释掉对应的 find_package 和 target_link_libraries 行
 # -----------------------------------------------------------------------------
 find_package(MPFHttpClient REQUIRED)    # HTTP 客户端库
-find_package(MPFUIComponents REQUIRED)  # UI 组件库
+# NOTE: MPFUIComponents is loaded by the host, not the plugin
+# Plugins access UI components via QML_IMPORT_PATH at runtime
+# DO NOT link MPFUIComponents here - it causes cross-DLL heap corruption!
 
 # -----------------------------------------------------------------------------
 # 【修改点3】插件库定义
@@ -108,7 +110,8 @@ target_link_libraries(orders-plugin PRIVATE
     
     # MPF 可选库 - 如不需要可注释掉
     MPF::mpf-http-client      # HTTP 客户端功能
-    MPF::mpf-ui-components    # UI 组件（MPFCard、MPFButton 等）
+    # NOTE: DO NOT link MPF::mpf-ui-components - host loads it!
+    # Linking here causes cross-DLL heap corruption on Windows
 )
 
 # -----------------------------------------------------------------------------
