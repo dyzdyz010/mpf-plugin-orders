@@ -114,6 +114,11 @@ target_link_libraries(orders-plugin PRIVATE
     # Linking here causes cross-DLL heap corruption on Windows
 )
 
+# Static link CRT on MinGW to avoid cross-DLL heap issues
+if(MINGW)
+    target_link_options(orders-plugin PRIVATE -static-libgcc -static-libstdc++)
+endif()
+
 # -----------------------------------------------------------------------------
 # 【修改点5】QML 模块定义
 # 
