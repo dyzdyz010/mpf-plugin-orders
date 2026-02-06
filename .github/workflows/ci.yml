@@ -12,22 +12,47 @@ on:
         description: 'SDK version (empty=latest)'
         required: false
         default: ''
-      force_latest:
-        description: 'Force use latest dependencies'
-        type: boolean
-        default: false
-  repository_dispatch:
-    types: [host-released]
+      http_client_version:
+        description: 'HTTP Client version (empty=latest)'
+        required: false
+        default: ''
 
 env:
   QT_VERSION: '6.8.3'
-  SDK_VERSION: ${{ github.event.inputs.sdk_version || github.event.client_payload.sdk_version || 'v1.0.2' }}
-  HTTP_CLIENT_VERSION: 'v1.0.2'
-  UI_COMPONENTS_VERSION: 'v1.0.4'
   PLUGIN_NAME: 'orders'
 
 jobs:
+  resolve-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      sdk_version: ${{ steps.resolve.outputs.sdk_version }}
+      http_client_version: ${{ steps.resolve.outputs.http_client_version }}
+    steps:
+      - name: Resolve dependency versions
+        id: resolve
+        run: |
+          # SDK version
+          if [[ -n "${{ github.event.inputs.sdk_version }}" ]]; then
+            SDK_VERSION="${{ github.event.inputs.sdk_version }}"
+          else
+            SDK_VERSION=$(gh release view -R dyzdyz010/mpf-sdk --json tagName -q '.tagName')
+          fi
+          echo "sdk_version=$SDK_VERSION" >> $GITHUB_OUTPUT
+          
+          # HTTP Client version
+          if [[ -n "${{ github.event.inputs.http_client_version }}" ]]; then
+            HTTP_VERSION="${{ github.event.inputs.http_client_version }}"
+          else
+            HTTP_VERSION=$(gh release view -R dyzdyz010/mpf-http-client --json tagName -q '.tagName')
+          fi
+          echo "http_client_version=$HTTP_VERSION" >> $GITHUB_OUTPUT
+          
+          echo "Using SDK: $SDK_VERSION, HTTP Client: $HTTP_VERSION"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
   build:
+    needs: resolve-versions
     strategy:
       fail-fast: false
       matrix:
@@ -65,10 +90,6 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y ninja-build libgl1-mesa-dev libxkbcommon-dev
 
-      - name: Install deps (Windows)
-        if: runner.os == 'Windows'
-        run: choco install ninja -y
-
       - name: Download dependencies
         shell: bash
         run: |
@@ -76,21 +97,18 @@ jobs:
           
           # Download SDK
           mkdir -p deps/mpf-sdk && cd deps/mpf-sdk
-          gh release download ${{ env.SDK_VERSION }} -R dyzdyz010/mpf-sdk -p "mpf-sdk-${{ matrix.artifact_suffix }}.${{ matrix.ext }}"
+          gh release download ${{ needs.resolve-versions.outputs.sdk_version }} \
+            -R dyzdyz010/mpf-sdk \
+            -p "mpf-sdk-${{ matrix.artifact_suffix }}.${{ matrix.ext }}"
           [[ "${{ matrix.ext }}" == "tar.gz" ]] && tar -xzf *.tar.gz || 7z x *.zip
           rm -f *.${{ matrix.ext }}
           cd ../..
           
           # Download http-client
           mkdir -p deps/mpf-http-client && cd deps/mpf-http-client
-          gh release download ${{ env.HTTP_CLIENT_VERSION }} -R dyzdyz010/mpf-http-client -p "mpf-http-client-${{ matrix.artifact_suffix }}.${{ matrix.ext }}"
-          [[ "${{ matrix.ext }}" == "tar.gz" ]] && tar -xzf *.tar.gz || 7z x *.zip
-          rm -f *.${{ matrix.ext }}
-          cd ../..
-          
-          # Download ui-components
-          mkdir -p deps/mpf-ui-components && cd deps/mpf-ui-components
-          gh release download ${{ env.UI_COMPONENTS_VERSION }} -R dyzdyz010/mpf-ui-components -p "mpf-ui-components-${{ matrix.artifact_suffix }}.${{ matrix.ext }}"
+          gh release download ${{ needs.resolve-versions.outputs.http_client_version }} \
+            -R dyzdyz010/mpf-http-client \
+            -p "mpf-http-client-${{ matrix.artifact_suffix }}.${{ matrix.ext }}"
           [[ "${{ matrix.ext }}" == "tar.gz" ]] && tar -xzf *.tar.gz || 7z x *.zip
           rm -f *.${{ matrix.ext }}
         env:
@@ -102,16 +120,16 @@ jobs:
           cmake -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Debug \
             -DCMAKE_INSTALL_PREFIX=$PWD/install \
-            -DCMAKE_PREFIX_PATH="$PWD/deps/mpf-sdk;$PWD/deps/mpf-http-client;$PWD/deps/mpf-ui-components"
+            -DCMAKE_PREFIX_PATH="$PWD/deps/mpf-sdk;$PWD/deps/mpf-http-client"
 
       - name: Configure (Windows)
         if: runner.os == 'Windows'
         shell: bash
         run: |
-          cmake -B build -G Ninja \
+          cmake -B build -G "MinGW Makefiles" \
             -DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install" \
-            -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/deps/mpf-sdk;$GITHUB_WORKSPACE/deps/mpf-http-client;$GITHUB_WORKSPACE/deps/mpf-ui-components"
+            -DCMAKE_INSTALL_PREFIX="$PWD/install" \
+            -DCMAKE_PREFIX_PATH="$PWD/deps/mpf-sdk;$PWD/deps/mpf-http-client"
 
       - name: Build
         shell: bash
@@ -156,11 +174,16 @@ jobs:
           files: artifacts/*
           generate_release_notes: true
 
-      - name: Trigger release build
-        if: success()
+  # Cascade: plugin-orders -> release (leaf node)
+  trigger-release:
+    needs: release
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger mpf-release
         run: |
-          curl -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.DISPATCH_TOKEN }}" \
-            https://api.github.com/repos/dyzdyz010/mpf-release/dispatches \
-            -d '{"event_type":"plugin-released","client_payload":{"plugin":"${{ env.PLUGIN_NAME }}","version":"${{ github.ref_name }}"}}'
+          VERSION="${GITHUB_REF_NAME}"
+          echo "Triggering mpf-release (plugin-orders $VERSION completed)"
+          gh workflow run release.yml -R dyzdyz010/mpf-release
+        env:
+          GH_TOKEN: ${{ secrets.DISPATCH_TOKEN }}
