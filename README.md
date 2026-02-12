@@ -12,7 +12,7 @@ Qt Modular Plugin Framework - Orders Plugin (Example)
 
 ## 依赖
 
-- Qt 6.5+ (Core, Gui, Qml, Quick, Network)
+- Qt 6.8+ (Core, Gui, Qml, Quick, Network)
 - mpf-sdk
 - mpf-http-client
 - mpf-ui-components
@@ -40,6 +40,20 @@ cmake --build build
 - 订单详情页面
 - 创建订单对话框
 - 菜单项和徽章
+
+## EventBus 通信
+
+通过 EventBus 实现与其他插件的松耦合通信：
+
+```cpp
+// 发布订单创建事件
+bus->publish("orders/created", {{"id", orderId}}, pluginId);
+
+// 处理其他插件的数据请求
+bus->registerHandler("orders/getById", pluginId, [this](const Event& e) -> QVariantMap {
+    return getOrder(e.data["id"].toString()).toVariantMap();
+});
+```
 
 ## 许可证
 
