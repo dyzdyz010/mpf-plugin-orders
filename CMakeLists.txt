@@ -161,8 +161,8 @@ qt_add_qml_module(orders-plugin
 # 插件 DLL 输出到 build/plugins 目录
 # -----------------------------------------------------------------------------
 set_target_properties(orders-plugin PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/plugins/mpf
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/plugins/mpf
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/plugins
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/plugins
 )
 
 # -----------------------------------------------------------------------------

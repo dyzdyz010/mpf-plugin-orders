@@ -226,15 +226,15 @@ void OrdersPlugin::registerRoutes()
         QStringList searchPaths;
         QString appDir = QCoreApplication::applicationDirPath();
         
-        // 1. MPF_SDK_ROOT 环境变量（mpf-dev 设置）
+        // 1. QML_IMPORT_PATH 环境变量（dev.json 开发路径优先）
+        QString qmlImportPaths = qEnvironmentVariable("QML_IMPORT_PATH");
+        searchPaths << qmlImportPaths.split(QDir::listSeparator(), Qt::SkipEmptyParts);
+
+        // 2. MPF_SDK_ROOT 环境变量（SDK 兜底）
         QString sdkRoot = qEnvironmentVariable("MPF_SDK_ROOT");
         if (!sdkRoot.isEmpty()) {
             searchPaths << QDir::cleanPath(sdkRoot + "/qml");
         }
-        
-        // 2. QML_IMPORT_PATH 环境变量
-        QString qmlImportPaths = qEnvironmentVariable("QML_IMPORT_PATH");
-        searchPaths << qmlImportPaths.split(QDir::listSeparator(), Qt::SkipEmptyParts);
         
         // 3. 应用程序相对路径（标准 SDK 安装布局）
         searchPaths << QDir::cleanPath(appDir + "/../qml");
