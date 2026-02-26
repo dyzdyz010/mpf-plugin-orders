@@ -1,3 +1,5 @@
+
+
 /**
  * =============================================================================
  * Orders Page - 主页面 QML
@@ -25,7 +27,6 @@
  * - StatusBadge: 状态徽章组件
  * =============================================================================
  */
-
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -65,9 +66,7 @@ Page {
     // 【数据模型使用】
     // OrderModel 是在 C++ 中定义的 QAbstractListModel 子类
     // 通过 qmlRegisterType 注册到 QML
-    //
     // service 属性绑定到 OrdersService 单例，模型会自动监听数据变化
-    //
     // 【修改点2】改为你的模型类名和服务名
     // -------------------------------------------------------------------------
     OrderModel {
@@ -78,7 +77,6 @@ Page {
     // =========================================================================
     // 页面头部 - 工具栏
     // =========================================================================
-
     header: ToolBar {
         background: Rectangle {
             color: Theme ? Theme.surfaceColor : "#F5F5F5"
@@ -114,7 +112,6 @@ Page {
             // -----------------------------------------------------------------
             // 【MPF 按钮组件】
             // MPFButton 是 MPF UI 组件库提供的统一风格按钮
-            //
             // 属性说明：
             // - text: 按钮文本
             // - type: 按钮类型 (primary, secondary, success, warning, danger, ghost)
@@ -124,8 +121,8 @@ Page {
             // -----------------------------------------------------------------
             MPFButton {
                 text: "+"
-                type: "primary"    // 主要按钮样式
-                size: "small"      // 小尺寸
+                type: "primary" // 主要按钮样式
+                size: "small" // 小尺寸
                 onClicked: createDialog.open()
             }
         }
@@ -134,7 +131,6 @@ Page {
     // =========================================================================
     // 统计卡片区域
     // =========================================================================
-
     RowLayout {
         id: statsRow
         anchors.top: parent.top
@@ -163,7 +159,6 @@ Page {
     // =========================================================================
     // 数据列表
     // =========================================================================
-
     ListView {
         id: ordersList
         anchors.top: statsRow.bottom
@@ -183,9 +178,7 @@ Page {
         // 【列表项代理】
         // delegate 定义每个列表项的渲染方式
         // OrderCard 是单独定义的组件
-        //
         // model.xxx 可以访问模型中定义的 role 数据
-        //
         // 【修改点3】改为你的列表项组件和属性绑定
         // ---------------------------------------------------------------------
         delegate: OrderCard {
@@ -212,7 +205,7 @@ Page {
             }
 
             // 状态变更处理
-            onStatusChangeRequested: function(newStatus) {
+            onStatusChangeRequested: function (newStatus) {
                 OrdersService.updateStatus(model.id, newStatus)
             }
 
@@ -255,33 +248,33 @@ Page {
     // -------------------------------------------------------------------------
     Popup {
         id: detailPopup
-        
+
         property string orderId: ""
         property var orderData: ({})
-        
+
         modal: true
         anchors.centerIn: parent
         width: Math.min(500, root.width - 48)
         height: Math.min(600, root.height - 48)
         padding: 24
-        
+
         background: Rectangle {
             color: Theme ? Theme.surfaceColor : "#FFFFFF"
             radius: Theme ? Theme.radiusMedium : 12
         }
-        
+
         onOpened: {
             orderData = OrdersService.getOrder(orderId)
         }
-        
+
         ColumnLayout {
             anchors.fill: parent
             spacing: 16
-            
+
             // Header
             RowLayout {
                 Layout.fillWidth: true
-                
+
                 Label {
                     text: qsTr("Order #%1").arg(detailPopup.orderId)
                     font.pixelSize: 20
@@ -289,78 +282,117 @@ Page {
                     color: Theme ? Theme.textColor : "#212121"
                     Layout.fillWidth: true
                 }
-                
+
                 Button {
                     text: "✕"
                     flat: true
                     onClicked: detailPopup.close()
                 }
             }
-            
+
             // Status
             RowLayout {
-                Label { text: qsTr("Status:"); color: Theme ? Theme.textSecondaryColor : "#757575" }
-                Label { 
+                Label {
+                    text: qsTr("Status:")
+                    color: Theme ? Theme.textSecondaryColor : "#757575"
+                }
+                Label {
                     text: detailPopup.orderData.status || ""
                     font.bold: true
                     color: Theme ? Theme.primaryColor : "#2196F3"
                 }
             }
-            
+
             // Customer
             RowLayout {
-                Label { text: qsTr("Customer:"); color: Theme ? Theme.textSecondaryColor : "#757575" }
-                Label { text: detailPopup.orderData.customerName || ""; color: Theme ? Theme.textColor : "#212121" }
+                Label {
+                    text: qsTr("Customer:")
+                    color: Theme ? Theme.textSecondaryColor : "#757575"
+                }
+                Label {
+                    text: detailPopup.orderData.customerName || ""
+                    color: Theme ? Theme.textColor : "#212121"
+                }
             }
-            
+
             // Product
             RowLayout {
-                Label { text: qsTr("Product:"); color: Theme ? Theme.textSecondaryColor : "#757575" }
-                Label { text: detailPopup.orderData.productName || ""; color: Theme ? Theme.textColor : "#212121" }
+                Label {
+                    text: qsTr("Product:")
+                    color: Theme ? Theme.textSecondaryColor : "#757575"
+                }
+                Label {
+                    text: detailPopup.orderData.productName || ""
+                    color: Theme ? Theme.textColor : "#212121"
+                }
             }
-            
+
             // Quantity & Price
             RowLayout {
-                Label { text: qsTr("Quantity:"); color: Theme ? Theme.textSecondaryColor : "#757575" }
-                Label { text: String(detailPopup.orderData.quantity || 0); color: Theme ? Theme.textColor : "#212121" }
-                Item { width: 24 }
-                Label { text: qsTr("Price:"); color: Theme ? Theme.textSecondaryColor : "#757575" }
-                Label { text: "$" + (detailPopup.orderData.price || 0).toFixed(2); color: Theme ? Theme.textColor : "#212121" }
+                Label {
+                    text: qsTr("Quantity:")
+                    color: Theme ? Theme.textSecondaryColor : "#757575"
+                }
+                Label {
+                    text: String(detailPopup.orderData.quantity || 0)
+                    color: Theme ? Theme.textColor : "#212121"
+                }
+                Item {
+                    width: 24
+                }
+                Label {
+                    text: qsTr("Price:")
+                    color: Theme ? Theme.textSecondaryColor : "#757575"
+                }
+                Label {
+                    text: "$" + (detailPopup.orderData.price || 0).toFixed(2)
+                    color: Theme ? Theme.textColor : "#212121"
+                }
             }
-            
+
             // Total
             RowLayout {
-                Label { text: qsTr("Total:"); font.bold: true; color: Theme ? Theme.textSecondaryColor : "#757575" }
-                Label { 
+                Label {
+                    text: qsTr("Total:")
+                    font.bold: true
+                    color: Theme ? Theme.textSecondaryColor : "#757575"
+                }
+                Label {
                     text: "$" + (detailPopup.orderData.total || 0).toFixed(2)
                     font.pixelSize: 18
                     font.bold: true
                     color: Theme ? Theme.primaryColor : "#2196F3"
                 }
             }
-            
-            Item { Layout.fillHeight: true }
-            
+
+            Item {
+                Layout.fillHeight: true
+            }
+
             // Actions
             RowLayout {
                 Layout.fillWidth: true
                 spacing: 8
-                
+
                 ComboBox {
                     id: statusCombo
                     model: ["pending", "processing", "shipped", "delivered", "cancelled"]
                     currentIndex: model.indexOf(detailPopup.orderData.status)
-                    
-                    onActivated: function(index) {
+
+                    onActivated: function (index) {
                         if (model[index] !== detailPopup.orderData.status) {
-                            OrdersService.updateStatus(detailPopup.orderId, model[index])
-                            detailPopup.orderData = OrdersService.getOrder(detailPopup.orderId)
+                            OrdersService.updateStatus(detailPopup.orderId,
+                                                       model[index])
+                            detailPopup.orderData = OrdersService.getOrder(
+                                        detailPopup.orderId)
                         }
                     }
                 }
-                
-                Item { Layout.fillWidth: true }
-                
+
+                Item {
+                    Layout.fillWidth: true
+                }
+
                 Button {
                     text: qsTr("Delete")
                     onClicked: {
@@ -369,7 +401,7 @@ Page {
                         detailPopup.close()
                     }
                 }
-                
+
                 Button {
                     text: qsTr("Close")
                     onClicked: detailPopup.close()
@@ -377,7 +409,7 @@ Page {
             }
         }
     }
-    
+
     // -------------------------------------------------------------------------
     // 【删除确认对话框】
     // -------------------------------------------------------------------------
@@ -409,10 +441,8 @@ Page {
     // 【QML 内联组件】
     // component 关键字定义可复用的内联组件
     // 这里定义了一个统计卡片组件，继承自 MPFCard
-    //
     // 【MPFCard 使用】
     // MPFCard 是 MPF UI 组件库提供的卡片容器
-    //
     // 属性说明：
     // - title/subtitle: 卡片标题（可选）
     // - cardColor: 背景颜色
@@ -422,6 +452,7 @@ Page {
     // - elevated: 阴影效果
     // -------------------------------------------------------------------------
     component StatCard: MPFCard {
+        id: statCard
         property string label: ""
         property string value: ""
 
@@ -434,14 +465,14 @@ Page {
             spacing: 4
 
             Label {
-                text: parent.parent.label
+                text: statCard.label
                 font.pixelSize: 12
                 color: Theme ? Theme.textSecondaryColor : "#757575"
                 Layout.alignment: Qt.AlignHCenter
             }
 
             Label {
-                text: parent.parent.value
+                text: statCard.value
                 font.pixelSize: 24
                 font.bold: true
                 color: Theme ? Theme.primaryColor : "#2196F3"

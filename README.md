@@ -1,60 +1,80 @@
 # MPF Orders Plugin
 
-Qt Modular Plugin Framework - Orders Plugin (Example)
+Qt Modular Plugin Framework - 订单管理插件（示例）
 
 ## 概述
 
-这是一个示例业务插件，展示如何：
-- 实现 IPlugin 接口
-- 注册路由和菜单
-- 使用 MPF UI 组件
-- QML 与 C++ 交互
+这是一个完整的业务插件示例，展示如何：
+- 实现 `IPlugin` 接口（initialize / start / stop 生命周期）
+- 注册路由和菜单项
+- 使用 MPF UI 组件（`import MPF.Components 1.0`）
+- QML 与 C++ 交互（Service 单例 + ListModel）
+- 使用 Theme 主题适配
 
 ## 依赖
 
-- Qt 6.8+ (Core, Gui, Qml, Quick, Network)
-- mpf-sdk
-- mpf-http-client
-- mpf-ui-components
+- Qt 6.8+（Core, Gui, Qml, Quick, Network）
+- MPF foundation-sdk
+- MPF http-client
+- MPF ui-components（运行时通过 QML import 加载，**不链接**）
 
 ## 构建
 
 ```bash
-export QT_DIR=/path/to/qt6
-export MPF_SDK=/path/to/mpf-sdk
+# 1. 确保已安装 mpf-dev 和 SDK
+mpf-dev setup
 
-# 使用 CMake Presets
-cmake --preset linux-debug
-cmake --build build/linux-debug
+# 2. 初始化项目（自动生成 CMakeUserPresets.json）
+mpf-dev init
 
-# 或手动配置
-cmake -B build -G Ninja \
-    -DCMAKE_PREFIX_PATH="$QT_DIR;$MPF_SDK" \
-    -DCMAKE_BUILD_TYPE=Debug
+# 3. 配置和构建
+cmake --preset dev
 cmake --build build
+```
+
+## 开发调试
+
+```bash
+# 注册插件到 dev.json
+mpf-dev link plugin orders ./build
+
+# 运行（使用 SDK 的 Host + 你的插件）
+mpf-dev run
+
+# 或在 Qt Creator 中：
+# 1. 打开 CMakeLists.txt，选择 dev preset
+# 2. 构建
+# 3. 通过 mpf-dev run 运行，或直接运行 Host（Host 自动读取 dev.json）
 ```
 
 ## 功能
 
-- 订单列表页面
-- 订单详情页面
-- 创建订单对话框
-- 菜单项和徽章
+- 订单列表页面（ListView + OrderCard）
+- 订单详情弹窗（Popup）
+- 创建订单对话框（MPFDialog）
+- 侧边栏菜单项 + 数量徽章
+- 状态筛选（ComboBox filter）
+- 统计卡片（Total Orders / Revenue）
 
-## EventBus 通信
+## 项目结构
 
-通过 EventBus 实现与其他插件的松耦合通信：
-
-```cpp
-// 发布订单创建事件
-bus->publish("orders/created", {{"id", orderId}}, pluginId);
-
-// 处理其他插件的数据请求
-bus->registerHandler("orders/getById", pluginId, [this](const Event& e) -> QVariantMap {
-    return getOrder(e.data["id"].toString()).toVariantMap();
-});
+```
+mpf-plugin-orders/
+├── CMakeLists.txt           # 构建配置（find_package(MPF)）
+├── include/
+│   ├── orders_plugin.h      # IPlugin 接口实现
+│   ├── orders_service.h     # 业务服务（Q_INVOKABLE 方法）
+│   └── order_model.h        # QAbstractListModel 子类
+├── src/
+│   ├── orders_plugin.cpp    # 插件生命周期、路由/菜单注册
+│   ├── orders_service.cpp   # CRUD 业务逻辑
+│   └── order_model.cpp      # 列表数据模型
+└── qml/
+    ├── OrdersPage.qml       # 主页面
+    ├── OrderCard.qml         # 列表项卡片
+    └── CreateOrderDialog.qml # 创建对话框
 ```
 
-## 许可证
+## License
 
-MIT License
+MIT
