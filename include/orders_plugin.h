@@ -32,6 +32,7 @@ namespace orders {
 
 // 前向声明 - 【修改点2】改为你的服务类名
 class OrdersService;
+class DemoService;
 
 /**
  * @brief 订单管理插件主类
@@ -156,6 +157,7 @@ private:
 
     mpf::ServiceRegistry* m_registry = nullptr;          // 服务注册表引用
     std::unique_ptr<OrdersService> m_ordersService;      // 【修改点6】业务服务实例
+    std::unique_ptr<DemoService> m_demoService;          // Demo service for framework showcase
 };
 
 } // namespace orders

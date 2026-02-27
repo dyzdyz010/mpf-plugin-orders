@@ -86,14 +86,18 @@ add_library(orders-plugin SHARED
     # 插件核心
     src/orders_plugin.cpp       # 插件主类 - 实现 IPlugin 接口
     include/orders_plugin.h
-    
+
     # 业务逻辑
     src/orders_service.cpp      # 业务服务 - 提供核心功能
     include/orders_service.h
-    
+
     # 数据模型
     src/order_model.cpp         # QML 列表模型 - 用于 ListView 等
     include/order_model.h
+
+    # Demo service
+    src/demo_service.cpp
+    include/demo_service.h
 )
 
 target_include_directories(orders-plugin PRIVATE
@@ -146,6 +150,7 @@ set(PLUGIN_QML_FILES
     qml/OrdersPage.qml           # 主页面（详情用 Popup 显示）
     qml/OrderCard.qml            # 列表项卡片
     qml/CreateOrderDialog.qml    # 创建对话框
+    qml/DemoPage.qml             # 框架演示页面
 )
 
 # Auto-flatten paths: qml/Foo.qml -> Foo.qml

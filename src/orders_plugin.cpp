@@ -25,11 +25,13 @@
 #include "orders_plugin.h"
 #include "orders_service.h"
 #include "order_model.h"
+#include "demo_service.h"
 
 // MPF SDK 头文件
 #include <mpf/service_registry.h>        // 服务注册表
 #include <mpf/interfaces/inavigation.h>  // 导航服务接口
 #include <mpf/interfaces/imenu.h>        // 菜单服务接口
+#include <mpf/interfaces/ieventbus.h>    // 事件总线接口
 #include <mpf/logger.h>                  // 日志宏
 
 #include <QJsonDocument>
@@ -93,7 +95,10 @@ bool OrdersPlugin::initialize(mpf::ServiceRegistry* registry)
     // 服务通常是整个插件生命周期内唯一的实例
     // -------------------------------------------------------------------------
     m_ordersService = std::make_unique<OrdersService>(this);
-    
+
+    // Demo service for framework showcase
+    m_demoService = std::make_unique<DemoService>("com.yourco.orders", this);
+
     // -------------------------------------------------------------------------
     // 【QML 类型注册】
     // 必须在 QML 引擎加载任何使用这些类型的文件之前完成
@@ -118,7 +123,16 @@ bool OrdersPlugin::start()
     // 在启动阶段注册，因为此时所有依赖的服务都已就绪
     // -------------------------------------------------------------------------
     registerRoutes();
-    
+
+    // Connect DemoService to EventBus for cross-plugin messaging
+    auto* eventBus = m_registry->get<mpf::IEventBus>();
+    if (eventBus) {
+        auto* eventBusObj = dynamic_cast<QObject*>(eventBus);
+        if (eventBusObj) {
+            m_demoService->connectToEventBus(eventBusObj, "demo/orders/");
+        }
+    }
+
     // -------------------------------------------------------------------------
     // 【示例数据】
     // 这里创建一些演示用的示例数据
@@ -267,7 +281,15 @@ void OrdersPlugin::registerRoutes()
         
         // 注册主页面（内部导航使用 Popup）
         nav->registerRoute("orders", ordersPage);
-        
+
+        // Register demo page route
+        QString demoFile = QDir::cleanPath(qmlBase + "/DemoPage.qml");
+        if (QFile::exists(demoFile)) {
+            QString demoPage = QUrl::fromLocalFile(demoFile).toString();
+            nav->registerRoute("orders-demo", demoPage);
+            MPF_LOG_INFO("OrdersPlugin", "Registered route: orders-demo");
+        }
+
         MPF_LOG_INFO("OrdersPlugin", "Registered route: orders");
     }
     
@@ -319,6 +341,17 @@ void OrdersPlugin::registerRoutes()
         });
         
         MPF_LOG_DEBUG("OrdersPlugin", "Registered menu item");
+
+        // Register demo menu item
+        mpf::MenuItem demoItem;
+        demoItem.id = "orders-demo";
+        demoItem.label = tr("Orders Demo");
+        demoItem.icon = "\xF0\x9F\x8E\xA8";  // 🎨
+        demoItem.route = "orders-demo";
+        demoItem.pluginId = "com.yourco.orders";
+        demoItem.order = 15;
+        demoItem.group = "Demo";
+        menu->registerItem(demoItem);
     } else {
         MPF_LOG_WARNING("OrdersPlugin", "Menu service not available");
     }
@@ -359,7 +392,10 @@ void OrdersPlugin::registerQmlTypes()
     //            OrderModel { service: OrdersService }
     // -------------------------------------------------------------------------
     qmlRegisterType<OrderModel>("YourCo.Orders", 1, 0, "OrderModel");
-    
+
+    // Register DemoService singleton for QML
+    qmlRegisterSingletonInstance("YourCo.Orders", 1, 0, "DemoService", m_demoService.get());
+
     MPF_LOG_DEBUG("OrdersPlugin", "Registered QML types");
 }
 
