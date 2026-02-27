@@ -27,6 +27,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)  # Qt MOC 自动处理
 
+# macOS RPATH settings for plugins (shared libraries)
+if(APPLE)
+    set(CMAKE_MACOSX_RPATH ON)
+    set(CMAKE_INSTALL_RPATH "@loader_path;@loader_path/../lib;@loader_path/../Frameworks")
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH OFF)
+endif()
+
 # -----------------------------------------------------------------------------
 # Qt 依赖
 # 根据你的插件功能需求添加或删除 Qt 模块
