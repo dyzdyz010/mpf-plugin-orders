@@ -16,10 +16,12 @@ Page {
     property string eventSubId: ""
 
     Component.onCompleted: {
-        eventSubId = EventBus.subscribeSimple("demo/orders/**", "com.yourco.orders.demo.qml")
+        eventSubId = EventBus.subscribeSimple("demo/orders/**",
+                                              "com.yourco.orders.demo.qml")
     }
     Component.onDestruction: {
-        if (eventSubId) EventBus.unsubscribe(eventSubId)
+        if (eventSubId)
+            EventBus.unsubscribe(eventSubId)
     }
 
     ScrollView {
@@ -78,12 +80,30 @@ Page {
                     Flow {
                         Layout.fillWidth: true
                         spacing: 8
-                        MPFButton { text: "Primary"; type: "primary" }
-                        MPFButton { text: "Secondary"; type: "secondary" }
-                        MPFButton { text: "Success"; type: "success" }
-                        MPFButton { text: "Warning"; type: "warning" }
-                        MPFButton { text: "Danger"; type: "danger" }
-                        MPFButton { text: "Ghost"; type: "ghost" }
+                        MPFButton {
+                            text: "Primary"
+                            type: "primary"
+                        }
+                        MPFButton {
+                            text: "Secondary"
+                            type: "secondary"
+                        }
+                        MPFButton {
+                            text: "Success"
+                            type: "success"
+                        }
+                        MPFButton {
+                            text: "Warning"
+                            type: "warning"
+                        }
+                        MPFButton {
+                            text: "Danger"
+                            type: "danger"
+                        }
+                        MPFButton {
+                            text: "Ghost"
+                            type: "ghost"
+                        }
                     }
 
                     Label {
@@ -95,9 +115,21 @@ Page {
 
                     Row {
                         spacing: 8
-                        MPFButton { text: "Small"; size: "small"; type: "primary" }
-                        MPFButton { text: "Medium"; size: "medium"; type: "primary" }
-                        MPFButton { text: "Large"; size: "large"; type: "primary" }
+                        MPFButton {
+                            text: "Small"
+                            size: "small"
+                            type: "primary"
+                        }
+                        MPFButton {
+                            text: "Medium"
+                            size: "medium"
+                            type: "primary"
+                        }
+                        MPFButton {
+                            text: "Large"
+                            size: "large"
+                            type: "primary"
+                        }
                     }
 
                     Label {
@@ -109,15 +141,24 @@ Page {
 
                     Row {
                         spacing: 8
-                        MPFButton { text: "Loading..."; loading: true; type: "primary" }
-                        MPFButton { text: "Disabled"; enabled: false; type: "primary" }
+                        MPFButton {
+                            text: "Loading..."
+                            loading: true
+                            type: "primary"
+                        }
+                        MPFButton {
+                            text: "Disabled"
+                            enabled: false
+                            type: "primary"
+                        }
                     }
 
                     // --- Separator ---
                     Rectangle {
                         Layout.fillWidth: true
                         height: 1
-                        color: Theme ? Qt.alpha(Theme.textSecondaryColor, 0.2) : "#E0E0E0"
+                        color: Theme ? Qt.alpha(Theme.textSecondaryColor,
+                                                0.2) : "#E0E0E0"
                     }
 
                     // --- Text Fields ---
@@ -132,23 +173,53 @@ Page {
                         Layout.fillWidth: true
                         spacing: 12
 
-                        MPFTextField { label: "Normal"; placeholder: "Type here..."; width: parent.width }
-                        MPFTextField { label: "Required"; required: true; placeholder: "Required field"; width: parent.width }
-                        MPFTextField { label: "With Error"; errorMessage: "This field is invalid"; text: "bad input"; width: parent.width }
-                        MPFTextField { label: "Read Only"; readOnly: true; text: "Cannot edit this"; width: parent.width }
+                        MPFTextField {
+                            label: "Normal"
+                            placeholder: "Type here..."
+                            width: parent.width
+                        }
+                        MPFTextField {
+                            label: "Required"
+                            required: true
+                            placeholder: "Required field"
+                            width: parent.width
+                        }
+                        MPFTextField {
+                            label: "With Error"
+                            errorMessage: "This field is invalid"
+                            text: "bad input"
+                            width: parent.width
+                        }
+                        MPFTextField {
+                            label: "Read Only"
+                            readOnly: true
+                            text: "Cannot edit this"
+                            width: parent.width
+                        }
 
                         Row {
                             width: parent.width
                             spacing: 16
-                            MPFTextField { label: "With Prefix"; prefix: "$"; placeholder: "0.00"; width: (parent.width - parent.spacing) / 2 }
-                            MPFTextField { label: "With Suffix"; suffix: "kg"; placeholder: "Weight"; width: (parent.width - parent.spacing) / 2 }
+                            MPFTextField {
+                                label: "With Prefix"
+                                prefix: "$"
+                                placeholder: "0.00"
+                                width: (parent.width - parent.spacing) / 2
+                            }
+                            MPFTextField {
+                                label: "With Suffix"
+                                suffix: "kg"
+                                placeholder: "Weight"
+                                width: (parent.width - parent.spacing) / 2
+                            }
                         }
                     }
 
                     Rectangle {
                         Layout.fillWidth: true
                         height: 1
-                        color: Theme ? Qt.alpha(Theme.textSecondaryColor, 0.2) : "#E0E0E0"
+                        color: Theme ? Qt.alpha(Theme.textSecondaryColor,
+                                                0.2) : "#E0E0E0"
                     }
 
                     // --- Status Badges ---
@@ -162,29 +233,69 @@ Page {
                     Flow {
                         Layout.fillWidth: true
                         spacing: 8
-                        StatusBadge { status: "info"; text: "Info" }
-                        StatusBadge { status: "success"; text: "Success" }
-                        StatusBadge { status: "warning"; text: "Warning" }
-                        StatusBadge { status: "error"; text: "Error" }
-                        StatusBadge { status: "pending"; text: "Pending" }
-                        StatusBadge { status: "processing"; text: "Processing" }
-                        StatusBadge { status: "shipped"; text: "Shipped" }
-                        StatusBadge { status: "delivered"; text: "Delivered" }
-                        StatusBadge { status: "cancelled"; text: "Cancelled" }
+                        StatusBadge {
+                            status: "info"
+                            text: "Info"
+                        }
+                        StatusBadge {
+                            status: "success"
+                            text: "Success"
+                        }
+                        StatusBadge {
+                            status: "warning"
+                            text: "Warning"
+                        }
+                        StatusBadge {
+                            status: "error"
+                            text: "Error"
+                        }
+                        StatusBadge {
+                            status: "pending"
+                            text: "Pending"
+                        }
+                        StatusBadge {
+                            status: "processing"
+                            text: "Processing"
+                        }
+                        StatusBadge {
+                            status: "shipped"
+                            text: "Shipped"
+                        }
+                        StatusBadge {
+                            status: "delivered"
+                            text: "Delivered"
+                        }
+                        StatusBadge {
+                            status: "cancelled"
+                            text: "Cancelled"
+                        }
                     }
 
                     Flow {
                         Layout.fillWidth: true
                         spacing: 8
-                        StatusBadge { status: "success"; outlined: true; text: "Outlined" }
-                        StatusBadge { status: "info"; size: "small"; text: "Small" }
-                        StatusBadge { status: "warning"; size: "large"; text: "Large" }
+                        StatusBadge {
+                            status: "success"
+                            outlined: true
+                            text: "Outlined"
+                        }
+                        StatusBadge {
+                            status: "info"
+                            size: "small"
+                            text: "Small"
+                        }
+                        StatusBadge {
+                            status: "warning"
+                            size: "large"
+                            text: "Large"
+                        }
                     }
 
                     Rectangle {
                         Layout.fillWidth: true
                         height: 1
-                        color: Theme ? Qt.alpha(Theme.textSecondaryColor, 0.2) : "#E0E0E0"
+                        color: Theme ? Qt.alpha(Theme.textSecondaryColor,
+                                                0.2) : "#E0E0E0"
                     }
 
                     // --- Loading Indicators ---
@@ -197,15 +308,25 @@ Page {
 
                     RowLayout {
                         spacing: 48
-                        MPFLoadingIndicator { size: "small"; text: "Small" }
-                        MPFLoadingIndicator { size: "medium"; text: "Loading..." }
-                        MPFLoadingIndicator { size: "large"; text: "Large" }
+                        MPFLoadingIndicator {
+                            size: "small"
+                            text: "Small"
+                        }
+                        MPFLoadingIndicator {
+                            size: "medium"
+                            text: "Loading..."
+                        }
+                        MPFLoadingIndicator {
+                            size: "large"
+                            text: "Large"
+                        }
                     }
 
                     Rectangle {
                         Layout.fillWidth: true
                         height: 1
-                        color: Theme ? Qt.alpha(Theme.textSecondaryColor, 0.2) : "#E0E0E0"
+                        color: Theme ? Qt.alpha(Theme.textSecondaryColor,
+                                                0.2) : "#E0E0E0"
                     }
 
                     // --- Cards ---
@@ -259,7 +380,8 @@ Page {
                     Rectangle {
                         Layout.fillWidth: true
                         height: 1
-                        color: Theme ? Qt.alpha(Theme.textSecondaryColor, 0.2) : "#E0E0E0"
+                        color: Theme ? Qt.alpha(Theme.textSecondaryColor,
+                                                0.2) : "#E0E0E0"
                     }
 
                     // --- Dialogs ---
@@ -273,10 +395,30 @@ Page {
                     Flow {
                         Layout.fillWidth: true
                         spacing: 8
-                        MPFButton { text: "Info Dialog"; type: "primary"; size: "small"; onClicked: infoDialog.open() }
-                        MPFButton { text: "Success Dialog"; type: "success"; size: "small"; onClicked: successDialog.open() }
-                        MPFButton { text: "Warning Dialog"; type: "warning"; size: "small"; onClicked: warningDialog.open() }
-                        MPFButton { text: "Danger Dialog"; type: "danger"; size: "small"; onClicked: dangerDialog.open() }
+                        MPFButton {
+                            text: "Info Dialog"
+                            type: "primary"
+                            size: "small"
+                            onClicked: infoDialog.open()
+                        }
+                        MPFButton {
+                            text: "Success Dialog"
+                            type: "success"
+                            size: "small"
+                            onClicked: successDialog.open()
+                        }
+                        MPFButton {
+                            text: "Warning Dialog"
+                            type: "warning"
+                            size: "small"
+                            onClicked: warningDialog.open()
+                        }
+                        MPFButton {
+                            text: "Danger Dialog"
+                            type: "danger"
+                            size: "small"
+                            onClicked: dangerDialog.open()
+                        }
                     }
                 }
             }
@@ -324,11 +466,14 @@ Page {
                             onClicked: {
                                 root.httpLoading = true
                                 root.httpStatusCode = 0
-                                DemoService.testPost(urlField.text, postBodyField.text)
+                                DemoService.testPost(urlField.text,
+                                                     postBodyField.text)
                             }
                         }
 
-                        Item { width: 8 }
+                        Item {
+                            width: 8
+                        }
 
                         StatusBadge {
                             visible: root.httpStatusCode > 0
@@ -345,65 +490,68 @@ Page {
                     }
 
                     // Response panel
-                    Item {
-                        width: parent.width
-                        height: 100
+                    // Item {
+                    //     width: parent.width
+                    //     height: 100
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: 8
+                        clip: true
+                        color: Theme ? Qt.darker(Theme.surfaceColor,
+                                                 1.03) : "#F5F5F5"
+                        border.width: 1
+                        border.color: Theme ? Qt.alpha(
+                                                  Theme.textSecondaryColor,
+                                                  0.2) : "#E0E0E0"
 
-                        Rectangle {
-                            anchors.fill: parent
-                            radius: 8
+                        Label {
+                            id: responseLabel
+                            anchors.top: parent.top
+                            anchors.left: parent.left
+                            anchors.margins: 12
+                            text: qsTr("Response")
+                            font.bold: true
+                            color: Theme ? Theme.textColor : "#212121"
+                        }
+
+                        Label {
+                            id: responseTimeLabel
+                            anchors.top: parent.top
+                            anchors.right: parent.right
+                            anchors.margins: 12
+                            text: ""
+                            font.pixelSize: 12
+                            color: Theme ? Theme.textSecondaryColor : "#757575"
+                        }
+
+                        Flickable {
+                            id: responseFlickable
+                            anchors.top: responseLabel.bottom
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.bottom: parent.bottom
+                            anchors.margins: 12
+                            anchors.topMargin: 8
                             clip: true
-                            color: Theme ? Qt.darker(Theme.surfaceColor, 1.03) : "#F5F5F5"
-                            border.width: 1
-                            border.color: Theme ? Qt.alpha(Theme.textSecondaryColor, 0.2) : "#E0E0E0"
+                            contentWidth: width
+                            contentHeight: responseBodyText.implicitHeight
+                            flickableDirection: Flickable.VerticalFlick
+                            boundsBehavior: Flickable.StopAtBounds
 
-                            Label {
-                                id: responseLabel
-                                anchors.top: parent.top
-                                anchors.left: parent.left
-                                anchors.margins: 12
-                                text: qsTr("Response")
-                                font.bold: true
-                                color: Theme ? Theme.textColor : "#212121"
-                            }
-
-                            Label {
-                                id: responseTimeLabel
-                                anchors.top: parent.top
-                                anchors.right: parent.right
-                                anchors.margins: 12
-                                text: ""
+                            Text {
+                                id: responseBodyText
+                                width: responseFlickable.width
+                                text: qsTr(
+                                          "Click a button to send a request...")
+                                font.family: "Consolas"
                                 font.pixelSize: 12
-                                color: Theme ? Theme.textSecondaryColor : "#757575"
-                            }
-
-                            Flickable {
-                                id: responseFlickable
-                                anchors.top: responseLabel.bottom
-                                anchors.left: parent.left
-                                anchors.right: parent.right
-                                anchors.bottom: parent.bottom
-                                anchors.margins: 12
-                                anchors.topMargin: 8
-                                clip: true
-                                contentWidth: width
-                                contentHeight: responseBodyText.implicitHeight
-                                flickableDirection: Flickable.VerticalFlick
-                                boundsBehavior: Flickable.StopAtBounds
-
-                                Text {
-                                    id: responseBodyText
-                                    width: responseFlickable.width
-                                    text: qsTr("Click a button to send a request...")
-                                    font.family: "Consolas"
-                                    font.pixelSize: 12
-                                    wrapMode: Text.Wrap
-                                    color: Theme ? Theme.textColor : "#212121"
-                                }
+                                wrapMode: Text.Wrap
+                                color: Theme ? Theme.textColor : "#212121"
                             }
                         }
                     }
 
+                    // }
                     Connections {
                         target: DemoService
                         function onHttpResponseReceived(success, statusCode, body, elapsedMs) {
@@ -433,9 +581,13 @@ Page {
                     // Subscription info
                     RowLayout {
                         spacing: 12
-                        StatusBadge { status: "info"; text: "Subscribed: demo/orders/**" }
+                        StatusBadge {
+                            status: "info"
+                            text: "Subscribed: demo/orders/**"
+                        }
                         Label {
-                            text: qsTr("Messages received: %1").arg(DemoService.receivedMessages.length)
+                            text: qsTr("Messages received: %1").arg(
+                                      DemoService.receivedMessages.length)
                             font.pixelSize: 13
                             color: Theme ? Theme.textSecondaryColor : "#757575"
                         }
@@ -445,7 +597,8 @@ Page {
                     Rectangle {
                         Layout.fillWidth: true
                         height: 1
-                        color: Theme ? Qt.alpha(Theme.textSecondaryColor, 0.2) : "#E0E0E0"
+                        color: Theme ? Qt.alpha(Theme.textSecondaryColor,
+                                                0.2) : "#E0E0E0"
                     }
 
                     // Publish to Rules plugin
@@ -471,20 +624,18 @@ Page {
                             type: "primary"
                             onClicked: {
                                 var count = EventBus.publish(
-                                    "demo/rules/message",
-                                    {
-                                        message: crossPluginMessage.text,
-                                        timestamp: Date.now(),
-                                        source: "Orders Plugin"
-                                    },
-                                    "com.yourco.orders.demo"
-                                )
+                                            "demo/rules/message", {
+                                                "message": crossPluginMessage.text,
+                                                "timestamp": Date.now(),
+                                                "source": "Orders Plugin"
+                                            }, "com.yourco.orders.demo")
                                 publishLog.insert(0, {
-                                    time: new Date().toLocaleTimeString(),
-                                    topic: "demo/rules/message",
-                                    message: crossPluginMessage.text,
-                                    subscribers: count
-                                })
+                                                      "time": new Date().toLocaleTimeString(
+                                                                  ),
+                                                      "topic": "demo/rules/message",
+                                                      "message": crossPluginMessage.text,
+                                                      "subscribers": count
+                                                  })
                             }
                         }
                     }
@@ -501,16 +652,21 @@ Page {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 120
                         radius: 6
-                        color: Theme ? Qt.darker(Theme.surfaceColor, 1.03) : "#F5F5F5"
+                        color: Theme ? Qt.darker(Theme.surfaceColor,
+                                                 1.03) : "#F5F5F5"
                         border.width: 1
-                        border.color: Theme ? Qt.alpha(Theme.textSecondaryColor, 0.2) : "#E0E0E0"
+                        border.color: Theme ? Qt.alpha(
+                                                  Theme.textSecondaryColor,
+                                                  0.2) : "#E0E0E0"
 
                         ListView {
                             anchors.fill: parent
                             anchors.margins: 8
                             clip: true
                             spacing: 4
-                            model: ListModel { id: publishLog }
+                            model: ListModel {
+                                id: publishLog
+                            }
 
                             delegate: RowLayout {
                                 width: ListView.view.width
@@ -556,7 +712,8 @@ Page {
                     Rectangle {
                         Layout.fillWidth: true
                         height: 1
-                        color: Theme ? Qt.alpha(Theme.textSecondaryColor, 0.2) : "#E0E0E0"
+                        color: Theme ? Qt.alpha(Theme.textSecondaryColor,
+                                                0.2) : "#E0E0E0"
                     }
 
                     // Received messages
@@ -580,9 +737,12 @@ Page {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 150
                         radius: 6
-                        color: Theme ? Qt.darker(Theme.surfaceColor, 1.03) : "#F5F5F5"
+                        color: Theme ? Qt.darker(Theme.surfaceColor,
+                                                 1.03) : "#F5F5F5"
                         border.width: 1
-                        border.color: Theme ? Qt.alpha(Theme.textSecondaryColor, 0.2) : "#E0E0E0"
+                        border.color: Theme ? Qt.alpha(
+                                                  Theme.textSecondaryColor,
+                                                  0.2) : "#E0E0E0"
 
                         ListView {
                             anchors.fill: parent
@@ -635,7 +795,9 @@ Page {
             }
 
             // Bottom spacer
-            Item { Layout.preferredHeight: 24 }
+            Item {
+                Layout.preferredHeight: 24
+            }
         }
     }
 
