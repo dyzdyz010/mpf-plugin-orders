@@ -79,7 +79,7 @@ Page {
     // =========================================================================
     header: ToolBar {
         background: Rectangle {
-            color: Theme ? Theme.surfaceColor : "#F5F5F5"
+            color: "transparent"
         }
 
         RowLayout {
@@ -87,14 +87,14 @@ Page {
             anchors.margins: Theme ? Theme.spacingSmall : 8
             spacing: Theme ? Theme.spacingSmall : 8
 
-            // 标题和计数
+            // 计数标签（标题已在宿主 Header 显示，不再重复）
             Label {
-                text: qsTr("Orders (%1)").arg(orderModel.count)
-                font.pixelSize: 18
-                font.bold: true
-                color: Theme ? Theme.textColor : "#212121"
-                Layout.fillWidth: true
+                text: qsTr("%1 orders").arg(orderModel.count)
+                font.pixelSize: 13
+                color: Theme ? Theme.textSecondaryColor : "#757575"
             }
+
+            Item { Layout.fillWidth: true }
 
             // -----------------------------------------------------------------
             // 【筛选器】
@@ -112,17 +112,11 @@ Page {
             // -----------------------------------------------------------------
             // 【MPF 按钮组件】
             // MPFButton 是 MPF UI 组件库提供的统一风格按钮
-            // 属性说明：
-            // - text: 按钮文本
-            // - type: 按钮类型 (primary, secondary, success, warning, danger, ghost)
-            // - size: 按钮尺寸 (small, medium, large)
-            // - loading: 加载状态
-            // - iconOnly: 只显示图标
             // -----------------------------------------------------------------
             MPFButton {
                 text: "+"
-                type: "primary" // 主要按钮样式
-                size: "small" // 小尺寸
+                type: "primary"
+                size: "small"
                 onClicked: createDialog.open()
             }
         }
@@ -458,7 +452,6 @@ Page {
 
         implicitHeight: 80
         cardColor: Theme ? Theme.surfaceColor : "#F5F5F5"
-        borderWidth: 0
 
         ColumnLayout {
             anchors.centerIn: parent

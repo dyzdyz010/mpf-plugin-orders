@@ -20,7 +20,6 @@ MPFCard {
     
     implicitHeight: 120
     cardColor: Theme ? Theme.surfaceColor : "#F5F5F5"
-    borderWidth: 0
     clickable: true
     hoverable: true
     contentPadding: Theme ? Theme.spacingMedium : 16
@@ -92,7 +91,7 @@ MPFCard {
                     model: ["pending", "processing", "shipped", "delivered", "cancelled"]
                     currentIndex: model.indexOf(root.status)
                     
-                    implicitWidth: 100
+                    implicitWidth: 130
                     
                     onActivated: function(index) {
                         if (model[index] !== root.status) {
