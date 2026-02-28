@@ -36,9 +36,6 @@
 
 #include <QJsonDocument>
 #include <QQmlEngine>
-#include <QCoreApplication>
-#include <QDir>
-#include <QUrl>
 #include <QFile>
 
 // 【修改点1】命名空间
@@ -80,12 +77,12 @@ bool OrdersPlugin::initialize(mpf::ServiceRegistry* registry)
     // 【调试】检查 qrc 资源是否可访问
     // -------------------------------------------------------------------------
     QStringList resourcesToCheck = {
-        ":/YourCo/Orders/qml/OrdersPage.qml",
-        "qrc:/YourCo/Orders/qml/OrdersPage.qml"
+        ":/YourCo/Orders/OrdersPage.qml",
+        "qrc:/YourCo/Orders/OrdersPage.qml"
     };
     for (const QString& res : resourcesToCheck) {
         QFile f(res);
-        MPF_LOG_DEBUG("OrdersPlugin", 
+        MPF_LOG_DEBUG("OrdersPlugin",
             QString("Resource check: %1 exists=%2").arg(res).arg(f.exists() ? "YES" : "NO").toStdString().c_str());
     }
     
@@ -236,61 +233,13 @@ void OrdersPlugin::registerRoutes()
     // -------------------------------------------------------------------------
     auto* nav = m_registry->get<mpf::INavigation>();
     if (nav) {
-        // 构建 QML 搜索路径列表（优先级从高到低）
-        QStringList searchPaths;
-        QString appDir = QCoreApplication::applicationDirPath();
-        
-        // 1. QML_IMPORT_PATH 环境变量（dev.json 开发路径优先）
-        QString qmlImportPaths = qEnvironmentVariable("QML_IMPORT_PATH");
-        searchPaths << qmlImportPaths.split(QDir::listSeparator(), Qt::SkipEmptyParts);
+        // QML 文件统一从 qrc 资源加载（由 qt_add_qml_module 嵌入 DLL）
+        // qrc 路径 = RESOURCE_PREFIX "/" + URI 转目录 + 文件名
+        nav->registerRoute("orders", "qrc:/YourCo/Orders/OrdersPage.qml");
+        MPF_LOG_INFO("OrdersPlugin", "Registered route: orders (qrc)");
 
-        // 2. MPF_SDK_ROOT 环境变量（SDK 兜底）
-        QString sdkRoot = qEnvironmentVariable("MPF_SDK_ROOT");
-        if (!sdkRoot.isEmpty()) {
-            searchPaths << QDir::cleanPath(sdkRoot + "/qml");
-        }
-        
-        // 3. 应用程序相对路径（标准 SDK 安装布局）
-        searchPaths << QDir::cleanPath(appDir + "/../qml");
-        
-        // 4. 应用程序同级 qml 目录（开发模式）
-        searchPaths << QDir::cleanPath(appDir + "/qml");
-        
-        // 查找 QML 模块目录
-        QString qmlBase;
-        QString qmlFile;
-        for (const QString& basePath : searchPaths) {
-            QString candidate = QDir::cleanPath(basePath + "/YourCo/Orders/OrdersPage.qml");
-            if (QFile::exists(candidate)) {
-                qmlBase = QDir::cleanPath(basePath + "/YourCo/Orders");
-                qmlFile = candidate;
-                break;
-            }
-        }
-        
-        if (qmlFile.isEmpty()) {
-            MPF_LOG_ERROR("OrdersPlugin", "Could not find YourCo/Orders/OrdersPage.qml!");
-            MPF_LOG_ERROR("OrdersPlugin", QString("Searched paths: %1").arg(searchPaths.join("; ")).toStdString().c_str());
-            return;
-        }
-        
-        QString ordersPage = QUrl::fromLocalFile(qmlFile).toString();
-        
-        MPF_LOG_INFO("OrdersPlugin", QString("QML base path: %1").arg(qmlBase).toStdString().c_str());
-        MPF_LOG_INFO("OrdersPlugin", QString("Orders page URL: %1").arg(ordersPage).toStdString().c_str());
-        
-        // 注册主页面（内部导航使用 Popup）
-        nav->registerRoute("orders", ordersPage);
-
-        // Register demo page route
-        QString demoFile = QDir::cleanPath(qmlBase + "/DemoPage.qml");
-        if (QFile::exists(demoFile)) {
-            QString demoPage = QUrl::fromLocalFile(demoFile).toString();
-            nav->registerRoute("orders-demo", demoPage);
-            MPF_LOG_INFO("OrdersPlugin", "Registered route: orders-demo");
-        }
-
-        MPF_LOG_INFO("OrdersPlugin", "Registered route: orders");
+        nav->registerRoute("orders-demo", "qrc:/YourCo/Orders/DemoPage.qml");
+        MPF_LOG_INFO("OrdersPlugin", "Registered route: orders-demo (qrc)");
     }
     
     // -------------------------------------------------------------------------

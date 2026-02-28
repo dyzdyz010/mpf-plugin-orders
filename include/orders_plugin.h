@@ -133,7 +133,7 @@ public:
      * 如果此插件提供应用的主入口界面，返回 QML 文件路径。
      * 大多数业务插件返回空字符串，只有"壳"插件才需要提供入口。
      * 
-     * 示例: return "qrc:/YourCo/Shell/qml/Main.qml";
+     * 示例: return "qrc:/YourCo/Shell/Main.qml";
      */
     QString entryQml() const override { return QString(); }
 

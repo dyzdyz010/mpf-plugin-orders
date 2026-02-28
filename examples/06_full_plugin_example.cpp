@@ -80,12 +80,9 @@ public:
         
         // ----- 2. 注册路由 -----
         if (nav) {
-            // 查找 QML 文件的完整逻辑见 orders_plugin.cpp
-            // 这里简化为直接构造路径
-            QString qmlFile = findQmlFile("Example/Module/MainPage.qml");
-            if (!qmlFile.isEmpty()) {
-                nav->registerRoute("example", QUrl::fromLocalFile(qmlFile).toString());
-            }
+            // QML 文件由 qt_add_qml_module 嵌入 DLL 的 qrc 资源
+            // qrc 路径 = RESOURCE_PREFIX "/" + URI 转目录 + 文件名
+            nav->registerRoute("example", "qrc:/Example/Module/MainPage.qml");
         }
         
         // ----- 3. 注册菜单项 -----
